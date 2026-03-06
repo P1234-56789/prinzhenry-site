@@ -426,17 +426,6 @@ footer p { font-size:.74rem; color:var(--muted); }
   .tx-amt { font-size: 1.4rem; }
   .eyebrow { font-size: .62rem; }
 }
-
-nav { padding:18px var(--pad-x); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:rgba(250,245,233,.95); backdrop-filter:blur(8px); z-index:100; border-bottom:1px solid rgba(240,232,208,.6); }
-.nav-logo { font-family:'Fraunces',serif; font-weight:900; font-size:clamp(1.2rem,3vw,1.5rem); color:var(--forest); letter-spacing:-1px; }
-.nav-logo span { color:var(--gold); }
-.nav-links { display:flex; gap:clamp(12px,2.5vw,28px); align-items:center; }
-.nav-links a { font-size:.85rem; color:var(--muted); font-weight:400; transition:color .2s; }
-.nav-links a:hover { color:var(--forest); }
-.nav-links a.active { color:var(--forest); font-weight:500; }
-.nav-cta { background:var(--forest); color:var(--gold-light) !important; padding:8px 18px; border-radius:100px; font-size:.78rem !important; font-weight:500 !important; letter-spacing:.5px; transition:background .2s !important; }
-.nav-cta:hover { background:#0a2016 !important; }
-
 </style>
 </head>
 <body>
@@ -445,13 +434,13 @@ nav { padding:18px var(--pad-x); display:flex; align-items:center; justify-conte
 
 <nav>
   <a href="index.html" class="nav-logo">Gh<span>Escrow</span></a>
-  
-  <div class="nav-links">
-    <a href="how-it-works.html" class="active">How it Works</a>
-    <a href="for-business.html">For Business</a>
-  </div>
   <div class="nav-pill">🇬🇭 &nbsp;Coming Soon</div>
 </nav>
+
+<div class="f-links">
+    <a href="how-it-works.html">How it Works</a>
+    <a href="for-business.html">For Business</a>
+</div>
 
 <section class="hero">
   <div class="geo geo-1"></div>
@@ -595,15 +584,14 @@ nav { padding:18px var(--pad-x); display:flex; align-items:center; justify-conte
   <p>© 2025 GhEscrow. Built for Ghana 🇬🇭</p>
   <div class="f-links">
     <a href="how-it-works.html">How it Works</a>
-    <a href="#">For Business</a>
-    <a href="#">Contact</a>
+    <a href="for-business.html">For Business</a>
   </div>
 </footer>
 
 <script>
   // ── CONFIGURATION ──────────────────────────────────────────
   // Paste your deployed Google Apps Script URL here after setup:
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkLIM_Ez4X7DDKvWcg-I5lYRCcYeHRk1FAizb9ctqtJf-KIn7lGkHjmpTU50Rtc9zs/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCUZalArrG8Btspfde00DCTdDF64Xbd-vbLsOM1Si4Cw0JtHhRm1xjyEceazLpxBJX/exec';
   // ───────────────────────────────────────────────────────────
 
   document.getElementById('phoneInput').addEventListener('input', e => {
@@ -636,7 +624,7 @@ nav { padding:18px var(--pad-x); display:flex; align-items:center; justify-conte
 
     // ── Submit to Google Sheets ──
     let sheetOk = false;
-    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbyCUZalArrG8Btspfde00DCTdDF64Xbd-vbLsOM1Si4Cw0JtHhRm1xjyEceazLpxBJX/exec') {
       try {
         const fd = new FormData();
         fd.append('phone', phone);
