@@ -518,7 +518,7 @@ footer{
 <nav>
   <a href="index.html" class="nav-logo">Gh<span>Escrow</span> <sub>for business</sub></a>
   <div class="nav-links">
-    <a href="#how">How it Works</a>
+    <a href="how-it-works.html">How it Works</a>
     <a href="#pricing" class="active">Pricing</a>
     <a href="#api">API Docs</a>
     <a href="index.html">Get Early Access</a>
@@ -999,7 +999,7 @@ tx = response.<span class="c-fn">json</span>()[<span class="c-str">'transaction'
       <button class="btn-gold" onclick="submitBizForm()" style="border:none">Get API Access →</button>
     </div>
     <div style="margin-top:12px;font-size:.74rem;color:var(--muted);text-align:center;position:relative;z-index:1">
-      Or email us directly: <strong style="color:var(--gold-lt)">business@ghescrow.com</strong>
+      Or email us directly: <strong style="color:var(--gold-lt)"><a>ghescrow1@gmail.com</a></strong>
     </div>
   </div>
 
@@ -1043,13 +1043,12 @@ tx = response.<span class="c-fn">json</span>()[<span class="c-str">'transaction'
     <p>© 2025 GhEscrow Ltd. Built for Ghana 🇬🇭</p>
     <div class="powered">
       <span class="powered-badge">Paystack</span>
-      <span class="powered-badge">Hubtel</span>
       <span class="powered-badge">BoG Compliant</span>
     </div>
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ── Integration steps ── */
 function setIntStep(clicked, idx) {
   document.querySelectorAll('.int-step').forEach((s,i) => {
@@ -1067,37 +1066,60 @@ function switchLang(btn, lang) {
   });
 }
 
+// ── CONFIGURATION — paste your deployed Apps Script URL here ──
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCUZalArrG8Btspfde00DCTdDF64Xbd-vbLsOM1Si4Cw0JtHhRm1xjyEceazLpxBJX/exec';
+// ──────────────────────────────────────────────────────────────
+
 /* ── Biz form ── */
-function submitBizForm() {
-  const name  = document.getElementById('bizName').value.trim();
-  const phone = document.getElementById('bizPhone').value.trim();
-  if(!name || !phone) {
-    const inputs = document.querySelectorAll('.cta-input');
-    inputs.forEach(i => {
-      if(!i.value.trim()){
-        i.closest('.cta-input-wrap').style.borderColor='var(--red)';
-        setTimeout(()=> i.closest('.cta-input-wrap').style.borderColor='',1500);
-      }
-    });
-    return;
+async function submitBizForm() {
+  const nameEl  = document.getElementById('bizName');
+  const phoneEl = document.getElementById('bizPhone');
+  const name    = nameEl.value.trim();
+  const phone   = phoneEl.value.trim();
+  const btn     = document.querySelector('.cta-section .btn-gold');
+
+  // Validate both fields
+  let hasError = false;
+  [nameEl, phoneEl].forEach(el => {
+    if (!el.value.trim()) {
+      el.closest('.cta-input-wrap').style.borderColor = 'var(--red)';
+      setTimeout(() => el.closest('.cta-input-wrap').style.borderColor = '', 1600);
+      hasError = true;
+    }
+  });
+  if (hasError) return;
+
+  // Loading state
+  btn.textContent = 'Sending…';
+  btn.disabled    = true;
+  btn.style.opacity = '0.7';
+
+  // ── Submit to Google Sheets ──
+  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbyCUZalArrG8Btspfde00DCTdDF64Xbd-vbLsOM1Si4Cw0JtHhRm1xjyEceazLpxBJX/exec') {
+    try {
+      const fd = new FormData();
+      fd.append('biz_name',  name);
+      fd.append('phone',     phone);
+      fd.append('source',    'business_page');
+      fd.append('timestamp', new Date().toISOString());
+      await fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd, mode: 'no-cors' });
+    } catch (err) {
+      console.warn('Sheet save failed, falling back to local:', err);
+    }
   }
+
+  // Always keep a local backup
   try {
-    const leads = JSON.parse(localStorage.getItem('ghescrow_biz_leads')||'[]');
-    leads.push({name,phone,at:new Date().toISOString()});
+    const leads = JSON.parse(localStorage.getItem('ghescrow_biz_leads') || '[]');
+    leads.push({ name, phone, source: 'business_page', at: new Date().toISOString() });
     localStorage.setItem('ghescrow_biz_leads', JSON.stringify(leads));
-  } catch(e){}
-  document.getElementById('contactForm').style.display='none';
+  } catch(e) {}
+
+  // Show success
+  document.getElementById('contactForm').style.display = 'none';
   document.getElementById('ctaSuccess').classList.add('show');
 }
 
 /* ── Smooth anchor scroll ── */
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const id = a.getAttribute('href').slice(1);
-    const el = document.getElementById(id);
-    if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'}); }
-  });
-});
-</script>
-</body>
-</html>
+document.querySelectorAll('a[href^="how-it-works.html"]').forEach(a => {
+  a.addEventListener(
