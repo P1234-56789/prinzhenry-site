@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GhEscrow for Business — Ghana's Escrow API</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,900;1,9..144,600;1,9..144,900&family=IBM+Plex+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --ink:       #06100c;
+  --ink2:      #0d2018;
+  --ink3:      #142b1e;
+  --forest:    #0d2b1f;
+  --green-mid: #1a5c38;
+  --green-br:  #22c55e;
+  --gold:      #e8a020;
+  --gold-lt:   #f5c460;
+  --gold-dim:  #b87a18;
+  --cream:     #faf5e9;
+  --cream2:    #f0e8d0;
+  --off-white: #f2f4f0;
+  --text:      #e8ede8;
+  --muted:     #6b8070;
+  --border:    rgba(255,255,255,.07);
+  --border2:   rgba(255,255,255,.12);
+  --red:       #e74c3c;
+  --blue:      #3b82f6;
+  --pad:       clamp(20px,5vw,72px);
+  --mono:      'IBM Plex Mono', monospace;
+  --display:   'Fraunces', serif;
+  --sans:      'DM Sans', sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{cursor:pointer;font-family:inherit}
+
+/* ══════════════════════════════════════════════
+   KENTE
+══════════════════════════════════════════════ */
+.kente{height:5px;background:repeating-linear-gradient(90deg,var(--gold) 0,var(--gold) 16px,var(--forest) 16px,var(--forest) 24px,#c0392b 24px,#c0392b 40px,var(--forest) 40px,var(--forest) 48px,var(--gold-lt) 48px,var(--gold-lt) 64px,var(--forest) 64px,var(--forest) 72px)}
+
+/* ══════════════════════════════════════════════
+   NAV
+══════════════════════════════════════════════ */
+nav{
+  padding:18px var(--pad);
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;
+  background:rgba(6,16,12,.92);
+  backdrop-filter:blur(14px);
+  z-index:100;
+}
+.nav-logo{font-family:var(--display);font-weight:900;font-size:1.4rem;color:#fff;letter-spacing:-1px}
+.nav-logo span{color:var(--gold)}
+.nav-logo sub{font-size:.55rem;font-family:var(--mono);color:var(--muted);font-weight:400;letter-spacing:1px;vertical-align:super;margin-left:4px}
+.nav-links{display:flex;align-items:center;gap:clamp(12px,2.5vw,28px)}
+.nav-links a{font-size:.84rem;color:var(--muted);font-weight:400;transition:color .18s}
+.nav-links a:hover{color:#fff}
+.nav-links a.active{color:var(--gold)}
+.nav-cta{background:var(--gold);color:var(--ink);font-weight:600;font-size:.82rem;padding:9px 20px;border-radius:8px;transition:background .18s,transform .12s;white-space:nowrap}
+.nav-cta:hover{background:var(--gold-lt);transform:translateY(-1px)}
+
+/* ══════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════ */
+.hero{
+  min-height:calc(100svh - 60px);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  gap:48px;
+  padding:72px var(--pad);
+  position:relative;
+  overflow:hidden;
+}
+/* Grid texture background */
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+}
+/* Glow orb */
+.hero::after{
+  content:'';
+  position:absolute;right:-200px;top:50%;transform:translateY(-50%);
+  width:700px;height:700px;
+  background:radial-gradient(circle,rgba(34,197,94,.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-left{position:relative;z-index:2;animation:fadeUp .9s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--green-br);margin-bottom:24px;
+  border:1px solid rgba(34,197,94,.25);
+  padding:5px 12px;border-radius:100px;
+  background:rgba(34,197,94,.06);
+}
+.eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green-br);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hero h1{
+  font-family:var(--display);font-weight:900;
+  font-size:clamp(2.8rem,5vw,4.6rem);
+  line-height:.98;letter-spacing:-2.5px;
+  color:#fff;margin-bottom:28px;
+}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero h1 .outline-text{
+  -webkit-text-stroke:1.5px rgba(255,255,255,.3);
+  color:transparent;
+}
+.hero-sub{
+  font-size:clamp(.95rem,1.6vw,1.05rem);
+  line-height:1.8;color:var(--muted);
+  max-width:480px;margin-bottom:40px;font-weight:300;
+}
+.hero-sub strong{color:var(--text);font-weight:500}
+
+.hero-cta-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:40px}
+.btn-gold{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--gold);color:var(--ink);
+  font-family:var(--display);font-weight:700;font-style:italic;
+  font-size:1rem;padding:14px 28px;border-radius:10px;border:none;
+  transition:background .18s,transform .15s,box-shadow .18s;
+}
+.btn-gold:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,160,32,.25)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:8px;
+  background:none;color:var(--text);
+  font-size:.9rem;font-weight:500;
+  padding:14px 24px;border-radius:10px;
+  border:1px solid var(--border2);
+  transition:border-color .18s,background .18s;
+}
+.btn-outline:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+
+.trust-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--muted)}
+.trust-item .ti{color:var(--green-br)}
+
+/* ══════════════════════════════════════════════
+   HERO RIGHT — CODE PREVIEW
+══════════════════════════════════════════════ */
+.hero-right{position:relative;z-index:2;animation:fadeUp .9s .18s ease both}
+.code-window{
+  background:var(--ink2);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);
+}
+.cw-header{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+}
+.cw-dot{width:11px;height:11px;border-radius:50%}
+.cw-dot.r{background:#ff5f57} .cw-dot.y{background:#febc2e} .cw-dot.g{background:#28c840}
+.cw-title{font-family:var(--mono);font-size:.7rem;color:var(--muted);margin-left:6px}
+.cw-badge{margin-left:auto;font-family:var(--mono);font-size:.6rem;background:rgba(34,197,94,.12);color:var(--green-br);padding:2px 8px;border-radius:100px;border:1px solid rgba(34,197,94,.2)}
+
+.code-body{padding:20px;font-family:var(--mono);font-size:.78rem;line-height:1.7;overflow-x:auto}
+.c-comment{color:#4a6358}
+.c-key{color:#79c0ff}
+.c-str{color:var(--gold-lt)}
+.c-val{color:#a5d6a7}
+.c-fn{color:#d2a8ff}
+.c-num{color:#f97316}
+.c-dim{color:#4a6358}
+
+.response-window{
+  margin-top:12px;
+  background:var(--ink2);
+  border:1px solid rgba(34,197,94,.2);
+  border-radius:12px;overflow:hidden;
+}
+.rw-header{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:rgba(34,197,94,.06);border-bottom:1px solid rgba(34,197,94,.15);
+  font-family:var(--mono);font-size:.65rem;color:var(--green-br);
+}
+.rw-status{display:flex;align-items:center;gap:5px}
+.rw-dot{width:6px;height:6px;border-radius:50%;background:var(--green-br)}
+.rw-body{padding:14px 16px;font-family:var(--mono);font-size:.75rem;line-height:1.6;color:var(--muted)}
+
+/* ══════════════════════════════════════════════
+   LOGOS / SOCIAL PROOF STRIP
+══════════════════════════════════════════════ */
+.proof-strip{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:20px var(--pad);
+  display:flex;align-items:center;gap:0;
+  background:rgba(255,255,255,.015);
+  flex-wrap:wrap;
+}
+.proof-label{font-family:var(--mono);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-right:32px;white-space:nowrap}
+.proof-logos{display:flex;align-items:center;gap:0;flex-wrap:wrap;flex:1}
+.proof-logo{
+  flex:1;min-width:100px;
+  padding:0 28px;
+  border-right:1px solid var(--border);
+  font-family:var(--display);font-weight:700;font-size:.95rem;
+  color:rgba(255,255,255,.15);letter-spacing:-.3px;
+  white-space:nowrap;
+}
+.proof-logo:last-child{border-right:none}
+
+/* ══════════════════════════════════════════════
+   USE CASE SECTION
+══════════════════════════════════════════════ */
+.section{padding:clamp(56px,8vh,100px) var(--pad)}
+.sec-label{font-family:var(--mono);font-size:.65rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--green-br);margin-bottom:12px}
+.sec-title{font-family:var(--display);font-weight:900;font-size:clamp(2rem,4vw,3.2rem);line-height:1.05;letter-spacing:-1.5px;color:#fff;margin-bottom:18px}
+.sec-title em{font-style:italic;color:var(--gold)}
+.sec-sub{font-size:clamp(.9rem,1.5vw,1rem);color:var(--muted);max-width:540px;line-height:1.8;font-weight:300}
+
+.use-cases-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  margin-top:clamp(40px,5vh,60px);
+}
+.uc-card{
+  background:var(--ink);
+  padding:28px 26px;
+  transition:background .2s;
+  position:relative;
+  overflow:hidden;
+}
+.uc-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at top left,rgba(232,160,32,.04),transparent 60%);
+  opacity:0;transition:opacity .25s;
+}
+.uc-card:hover{background:var(--ink2)}
+.uc-card:hover::before{opacity:1}
+.uc-icon{font-size:1.6rem;margin-bottom:14px}
+.uc-card h3{font-family:var(--display);font-weight:700;font-size:1.05rem;color:#fff;margin-bottom:8px;letter-spacing:-.3px}
+.uc-card p{font-size:.83rem;color:var(--muted);line-height:1.7}
+.uc-tag{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(232,160,32,.1);color:var(--gold);border:1px solid rgba(232,160,32,.2)}
+
+/* ══════════════════════════════════════════════
+   HOW INTEGRATION WORKS
+══════════════════════════════════════════════ */
+.integration-section{background:var(--ink2)}
+.int-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:48px}
+.int-steps{display:flex;flex-direction:column;gap:0}
+.int-step{
+  display:flex;gap:20px;padding:24px 0;
+  border-bottom:1px solid var(--border);position:relative;cursor:pointer;
+}
+.int-step:last-child{border-bottom:none}
+.int-step.active .is-num{background:var(--gold);color:var(--ink)}
+.int-step.active .is-title{color:#fff}
+.is-num{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,.06);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--display);font-weight:900;font-size:.9rem;
+  color:var(--muted);transition:all .2s;margin-top:2px;
+}
+.is-content{flex:1}
+.is-title{font-family:var(--display);font-weight:700;font-size:1rem;color:var(--muted);margin-bottom:5px;letter-spacing:-.2px;transition:color .2s}
+.is-desc{font-size:.83rem;color:var(--muted);line-height:1.65;display:none}
+.int-step.active .is-desc{display:block;color:rgba(255,255,255,.5)}
+
+.int-code-panel{position:sticky;top:80px}
+.tab-bar{display:flex;gap:2px;margin-bottom:12px}
+.lang-tab{
+  padding:7px 14px;border-radius:8px;border:none;
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);background:none;
+  transition:all .18s;cursor:pointer;
+}
+.lang-tab.active{background:rgba(255,255,255,.08);color:#fff}
+.lang-tab:hover{color:var(--text)}
+
+/* ══════════════════════════════════════════════
+   PRICING
+══════════════════════════════════════════════ */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+  margin-top:48px;
+}
+.price-card{
+  background:var(--ink2);
+  border:1px solid var(--border2);
+  border-radius:16px;padding:28px 24px;
+  position:relative;
+  transition:border-color .2s,transform .2s;
+}
+.price-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.2)}
+.price-card.featured{
+  border-color:var(--gold);
+  background:linear-gradient(135deg,rgba(232,160,32,.06) 0%,var(--ink2) 60%);
+}
+.price-card.featured::before{
+  content:'Most Popular';
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);
+  background:var(--gold);color:var(--ink);
+  font-family:var(--mono);font-size:.6rem;font-weight:500;letter-spacing:1px;
+  padding:3px 12px;border-radius:100px;white-space:nowrap;
+}
+.pc-tier{font-family:var(--mono);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.pc-price{font-family:var(--display);font-weight:900;font-size:2.4rem;color:#fff;letter-spacing:-1.5px;margin-bottom:4px;line-height:1}
+.pc-price span{font-size:1rem;font-weight:300;color:var(--muted);margin-right:2px}
+.pc-price sub{font-size:.8rem;font-family:var(--sans);font-weight:400;color:var(--muted);vertical-align:baseline;margin-left:4px}
+.pc-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:20px;min-height:40px}
+.pc-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:24px}
+.pc-features li{font-size:.82rem;color:rgba(255,255,255,.6);display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.pc-features li::before{content:'✓';color:var(--green-br);font-weight:700;flex-shrink:0;font-size:.8rem;margin-top:1px}
+.pc-features li.dim{color:var(--muted)}
+.pc-features li.dim::before{content:'—';color:var(--border2)}
+.pc-btn{
+  width:100%;padding:12px;border-radius:10px;border:none;
+  font-family:var(--display);font-weight:700;font-style:italic;
+  font-size:.95rem;transition:all .18s;
+}
+.pc-btn.gold-btn{background:var(--gold);color:var(--ink)}
+.pc-btn.gold-btn:hover{background:var(--gold-lt)}
+.pc-btn.outline-btn{background:none;border:1px solid var(--border2);color:var(--text)}
+.pc-btn.outline-btn:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+
+/* ══════════════════════════════════════════════
+   FEATURES TABLE
+══════════════════════════════════════════════ */
+.feat-table{
+  width:100%;border-collapse:collapse;
+  margin-top:40px;font-size:.84rem;
+}
+.feat-table th{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);
+  padding:12px 16px;border-bottom:1px solid var(--border2);
+  text-align:left;
+}
+.feat-table th:not(:first-child){text-align:center}
+.feat-table td{
+  padding:13px 16px;border-bottom:1px solid var(--border);
+  color:rgba(255,255,255,.65);vertical-align:middle;
+}
+.feat-table td:not(:first-child){text-align:center}
+.feat-table tr:last-child td{border-bottom:none}
+.feat-table tr:hover td{background:rgba(255,255,255,.02)}
+.ft-check{color:var(--green-br);font-size:1rem}
+.ft-cross{color:var(--border2);font-size:.9rem}
+.ft-custom{color:var(--gold);font-size:.78rem;font-family:var(--mono)}
+.ft-group td{
+  background:rgba(255,255,255,.025);
+  font-family:var(--mono);font-size:.65rem;
+  letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  padding:8px 16px;
+}
+
+/* ══════════════════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════════════════ */
+.testi-section{background:var(--ink2)}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:48px}
+.testi-card{
+  background:var(--ink);border:1px solid var(--border2);
+  border-radius:14px;padding:24px;
+  transition:border-color .2s;
+}
+.testi-card:hover{border-color:rgba(232,160,32,.3)}
+.testi-quote{font-size:.9rem;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:18px;font-style:italic;font-family:var(--display);font-weight:300}
+.testi-quote::before{content:'"';color:var(--gold);font-size:1.4rem;line-height:0;vertical-align:-.3em;margin-right:2px}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;flex-shrink:0}
+.testi-name{font-size:.84rem;font-weight:600;color:#fff}
+.testi-biz{font-size:.73rem;color:var(--muted)}
+
+/* ══════════════════════════════════════════════
+   API DOCS PREVIEW
+══════════════════════════════════════════════ */
+.endpoints-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:12px;
+  margin-top:40px;
+}
+.ep-card{
+  background:var(--ink2);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  display:flex;align-items:flex-start;gap:12px;
+  transition:border-color .2s;cursor:pointer;
+}
+.ep-card:hover{border-color:rgba(255,255,255,.15)}
+.ep-method{
+  font-family:var(--mono);font-size:.65rem;font-weight:500;
+  padding:3px 8px;border-radius:4px;letter-spacing:.5px;flex-shrink:0;margin-top:2px;
+}
+.m-post{background:rgba(59,130,246,.15);color:#93c5fd}
+.m-get{background:rgba(34,197,94,.12);color:#86efac}
+.m-patch{background:rgba(232,160,32,.12);color:var(--gold-lt)}
+.m-delete{background:rgba(231,76,60,.12);color:#fca5a5}
+.ep-path{font-family:var(--mono);font-size:.78rem;color:#fff;margin-bottom:3px}
+.ep-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+
+/* ══════════════════════════════════════════════
+   BOTTOM CTA
+══════════════════════════════════════════════ */
+.cta-section{
+  background:linear-gradient(135deg,var(--ink2) 0%,var(--ink3) 50%,var(--ink2) 100%);
+  padding:clamp(72px,10vh,120px) var(--pad);
+  text-align:center;position:relative;overflow:hidden;
+}
+.cta-section::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.cta-section::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(232,160,32,.06) 0%,transparent 65%);pointer-events:none}
+.cta-section h2{font-family:var(--display);font-weight:900;font-size:clamp(2.2rem,5vw,4rem);color:#fff;letter-spacing:-2px;margin-bottom:16px;position:relative;z-index:1;line-height:1.05}
+.cta-section h2 em{color:var(--gold);font-style:italic}
+.cta-section p{font-size:clamp(.9rem,1.6vw,1.05rem);color:var(--muted);max-width:520px;margin:0 auto 36px;line-height:1.75;position:relative;z-index:1}
+.cta-form{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.cta-input-wrap{display:flex;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:10px;overflow:hidden;transition:border-color .2s}
+.cta-input-wrap:focus-within{border-color:var(--gold)}
+.cta-input{padding:14px 18px;background:none;border:none;outline:none;font-family:var(--sans);font-size:.95rem;color:#fff;width:240px}
+.cta-input::placeholder{color:var(--muted)}
+
+/* ══════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════ */
+footer{
+  background:var(--ink);
+  border-top:1px solid var(--border);
+  padding:clamp(40px,6vh,64px) var(--pad) 28px;
+}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand .fl{font-family:var(--display);font-weight:900;font-size:1.3rem;color:#fff;letter-spacing:-1px;margin-bottom:10px}
+.footer-brand .fl span{color:var(--gold)}
+.footer-brand p{font-size:.82rem;color:var(--muted);line-height:1.7;max-width:220px}
+.footer-col h4{font-family:var(--mono);font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.footer-col a{display:block;font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:8px;transition:color .18s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:24px;border-top:1px solid var(--border)}
+.footer-bottom p{font-size:.74rem;color:var(--muted)}
+.footer-bottom .powered{display:flex;align-items:center;gap:12px}
+.powered-badge{font-family:var(--mono);font-size:.62rem;padding:3px 9px;border-radius:4px;border:1px solid var(--border2);color:var(--muted)}
+
+/* ══════════════════════════════════════════════
+   MISC UTILS
+══════════════════════════════════════════════ */
+.divider-line{width:100%;height:1px;background:var(--border);margin:8px 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px);align-items:center}
+.stat-row{display:flex;gap:clamp(24px,4vw,48px);flex-wrap:wrap;margin-top:32px}
+.stat-block .sv{font-family:var(--display);font-weight:900;font-size:clamp(2rem,4vw,3rem);color:#fff;letter-spacing:-1.5px}
+.stat-block .sv span{color:var(--gold)}
+.stat-block .sl{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+/* success state */
+.cta-success{display:none;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:10px;color:#86efac;font-size:.9rem}
+.cta-success.show{display:flex;animation:fadeUp .4s ease}
+.cs-check{width:26px;height:26px;background:var(--green-br);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;font-size:.8rem}
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media(max-width:1100px){
+  .int-grid{grid-template-columns:1fr}
+  .int-code-panel{position:static}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:auto;padding:48px var(--pad) 56px;gap:48px}
+  .split{grid-template-columns:1fr}
+  .feat-table{font-size:.75rem}
+  .feat-table th:nth-child(3),.feat-table td:nth-child(3){display:none}
+  nav{padding:14px 20px}
+  .nav-links a:not(.nav-cta):not(.active){display:none}
+}
+@media(max-width:600px){
+  .hero-cta-row{flex-direction:column;align-items:flex-start}
+  .btn-gold,.btn-outline{width:100%;justify-content:center}
+  .pricing-grid{grid-template-columns:1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-col:not(:first-child){display:none}
+  .cta-form{flex-direction:column;align-items:center}
+  .cta-input{width:100%}
+  .cta-input-wrap{width:100%;max-width:340px}
+  .btn-gold{width:100%;max-width:340px;justify-content:center}
+  .proof-logos{gap:0}
+  .proof-logo{min-width:80px;padding:0 16px;font-size:.8rem}
+}
+</style>
+</head>
+<body>
+
+<div class="kente"></div>
+
+<!-- ── NAV ───────────────────────────────── -->
+<nav>
+  <a href="index.html" class="nav-logo">Gh<span>Escrow</span> <sub>for business</sub></a>
+  <div class="nav-links">
+    <a href="#how">How it Works</a>
+    <a href="#pricing" class="active">Pricing</a>
+    <a href="#api">API Docs</a>
+    <a href="index.html">Get Early Access</a>
+    <a href="#contact" class="nav-cta">Get API Access →</a>
+  </div>
+</nav>
+
+<!-- ══ HERO ══════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="eyebrow">Enterprise Escrow API &nbsp;·&nbsp; Ghana</div>
+
+    <h1>
+      Embed Trust<br>
+      Into <em>Every</em><br>
+      <span class="outline-text">Transaction.</span>
+    </h1>
+
+    <p class="hero-sub">
+      Add a <strong>"Pay with GhEscrow"</strong> button to your marketplace,
+      e-commerce store, or logistics platform in under a day.
+      Let Ghana's most trusted escrow engine handle the money — you handle the business.
+    </p>
+
+    <div class="hero-cta-row">
+      <a href="#contact" class="btn-gold">Get API Access →</a>
+      <a href="#api" class="btn-outline">📄 View API Docs</a>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><span class="ti">✓</span> MoMo & Card ready</div>
+      <div class="trust-item"><span class="ti">✓</span> Sandbox available</div>
+      <div class="trust-item"><span class="ti">✓</span> REST + Webhooks</div>
+      <div class="trust-item"><span class="ti">✓</span> BoG-compliant</div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <!-- Code snippet window -->
+    <div class="code-window">
+      <div class="cw-header">
+        <div class="cw-dot r"></div><div class="cw-dot y"></div><div class="cw-dot g"></div>
+        <span class="cw-title">create_escrow.js</span>
+        <span class="cw-badge">REST API</span>
+      </div>
+      <div class="code-body">
+<span class="c-comment">// Create an escrow transaction</span>
+<span class="c-key">const</span> response = <span class="c-key">await</span> <span class="c-fn">fetch</span>(<span class="c-str">'https://api.ghescrow.com/v1/transactions'</span>, {
+  method: <span class="c-str">'POST'</span>,
+  headers: {
+    <span class="c-str">'Authorization'</span>: <span class="c-str">`Bearer <span class="c-num">${</span>API_KEY<span class="c-num">}</span>`</span>,
+    <span class="c-str">'Content-Type'</span>:  <span class="c-str">'application/json'</span>,
+  },
+  body: <span class="c-fn">JSON.stringify</span>({
+    title:           <span class="c-str">'Samsung Galaxy S24 — Used'</span>,
+    amount_ghs:      <span class="c-num">2800</span>,
+    buyer_phone:     <span class="c-str">'+233201234567'</span>,
+    seller_phone:    <span class="c-str">'+233551234567'</span>,
+    fee_payer:       <span class="c-str">'buyer'</span>,
+    inspection_hrs:  <span class="c-num">24</span>,
+    webhook_url:     <span class="c-str">'https://yourbiz.com/webhooks/escrow'</span>,
+  }),
+});
+
+<span class="c-key">const</span> { transaction } = <span class="c-key">await</span> response.<span class="c-fn">json</span>();
+<span class="c-dim">// → transaction.reference: "ESC-00847291"</span>
+<span class="c-dim">// → transaction.payment_link: "ghescrow.com/pay/ESC-00847291"</span>
+      </div>
+    </div>
+
+    <!-- Response window -->
+    <div class="response-window">
+      <div class="rw-header">
+        <div class="rw-status"><div class="rw-dot"></div> 201 Created &nbsp;·&nbsp; 142ms</div>
+        <span style="margin-left:auto;color:var(--muted)">application/json</span>
+      </div>
+      <div class="rw-body">
+{ <span style="color:#79c0ff">"status"</span>: <span style="color:var(--gold-lt)">"ok"</span>,<br>
+  <span style="color:#79c0ff">"transaction"</span>: {<br>
+  &nbsp;&nbsp;<span style="color:#79c0ff">"reference"</span>: <span style="color:var(--gold-lt)">"ESC-00847291"</span>,<br>
+  &nbsp;&nbsp;<span style="color:#79c0ff">"status"</span>: <span style="color:#a5d6a7">"CREATED"</span>,<br>
+  &nbsp;&nbsp;<span style="color:#79c0ff">"payment_link"</span>: <span style="color:var(--gold-lt)">"ghescrow.com/pay/ESC-00847291"</span>,<br>
+  &nbsp;&nbsp;<span style="color:#79c0ff">"amount_ghs"</span>: <span style="color:#f97316">2800</span>,<br>
+  &nbsp;&nbsp;<span style="color:#79c0ff">"expires_at"</span>: <span style="color:var(--gold-lt)">"2025-03-06T09:14:00Z"</span> } }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROOF STRIP ──────────────────────────── -->
+<div class="proof-strip">
+  <div class="proof-label">Trusted by</div>
+  <div class="proof-logos">
+    <div class="proof-logo">Tonaton</div>
+    <div class="proof-logo">Meqasa</div>
+    <div class="proof-logo">Jumia GH</div>
+    <div class="proof-logo">Cheki GH</div>
+    <div class="proof-logo">OLX Ghana</div>
+  </div>
+</div>
+
+<!-- ══ USE CASES ══════════════════════════════════════════════ -->
+<section class="section">
+  <div class="sec-label">Who Uses This</div>
+  <h2 class="sec-title">Built for Every <em>Ghanaian</em> Business Model</h2>
+  <p class="sec-sub">Whether you run a two-sided marketplace or a logistics company, the API slots into your existing stack.</p>
+
+  <div class="use-cases-grid">
+    <div class="uc-card">
+      <div class="uc-icon">🛒</div>
+      <h3>E-commerce Marketplaces</h3>
+      <p>Add "Pay with Escrow" at checkout. Buyers pay confidently, sellers ship, funds release on delivery confirmation. Reduce charge-backs to zero.</p>
+      <span class="uc-tag">Checkout Integration</span>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🚗</div>
+      <h3>Auto & Property Platforms</h3>
+      <p>High-value transactions — cars, land, rentals. Escrow holds the deposit while documents are verified. Both parties protected, deal moves forward.</p>
+      <span class="uc-tag">High-Value Deals</span>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🎨</div>
+      <h3>Freelance Platforms</h3>
+      <p>Built-in milestone escrow for projects. Client funds the project, funds release stage by stage as milestones are approved. No more unpaid invoices.</p>
+      <span class="uc-tag">Milestone Payments</span>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">📦</div>
+      <h3>Logistics & Delivery</h3>
+      <p>Add rider-confirmed delivery to your flow. Funds only release when your delivery agent marks the item as handed over — with GPS and photo proof.</p>
+      <span class="uc-tag">Delivery Confirmation</span>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🏭</div>
+      <h3>B2B Wholesale</h3>
+      <p>Protect bulk orders between manufacturers and distributors. Partial release on shipment, full release on goods received and inspected.</p>
+      <span class="uc-tag">Bulk Trade</span>
+    </div>
+    <div class="uc-card">
+      <div class="uc-icon">🔌</div>
+      <h3>Fintech & SuperApps</h3>
+      <p>Embed GhEscrow as a payment rail inside your existing app. Use our API to create, fund, and release escrows entirely within your own UI.</p>
+      <span class="uc-tag">White-Label API</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW INTEGRATION WORKS ══════════════════════════════════ -->
+<section class="section integration-section" id="how">
+  <div class="sec-label">Developer Docs</div>
+  <h2 class="sec-title">Live in <em>Hours,</em> Not Weeks</h2>
+  <p class="sec-sub">A clean REST API with webhooks, a full sandbox, and SDKs for the most popular platforms.</p>
+
+  <div class="int-grid">
+    <div class="int-steps">
+      <div class="int-step active" onclick="setIntStep(this,0)">
+        <div class="is-num">1</div>
+        <div class="is-content">
+          <div class="is-title">Get your API keys</div>
+          <div class="is-desc">Sign up for a business account, verify your business registration, and receive your sandbox and production API keys within 24 hours.</div>
+        </div>
+      </div>
+      <div class="int-step" onclick="setIntStep(this,1)">
+        <div class="is-num">2</div>
+        <div class="is-content">
+          <div class="is-title">Create an escrow via API</div>
+          <div class="is-desc">POST to /v1/transactions with the buyer, seller, amount, and your webhook URL. We return a payment link you embed or send directly.</div>
+        </div>
+      </div>
+      <div class="int-step" onclick="setIntStep(this,2)">
+        <div class="is-num">3</div>
+        <div class="is-content">
+          <div class="is-title">Buyer funds via MoMo or card</div>
+          <div class="is-desc">Your buyer follows the payment link and pays via MTN MoMo, Telecel Cash, AT Money, or card — no app download needed.</div>
+        </div>
+      </div>
+      <div class="int-step" onclick="setIntStep(this,3)">
+        <div class="is-num">4</div>
+        <div class="is-content">
+          <div class="is-title">Receive webhooks in real-time</div>
+          <div class="is-desc">We POST to your webhook_url at every status change — FUNDED, IN_TRANSIT, DELIVERED, COMPLETED, DISPUTED. Update your UI instantly.</div>
+        </div>
+      </div>
+      <div class="int-step" onclick="setIntStep(this,4)">
+        <div class="is-num">5</div>
+        <div class="is-content">
+          <div class="is-title">Release or dispute programmatically</div>
+          <div class="is-desc">PATCH /transactions/:id/release when the buyer accepts. Or your platform logic can trigger auto-release after your inspection window expires.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="int-code-panel">
+      <div class="tab-bar">
+        <button class="lang-tab active" onclick="switchLang(this,'js')">JavaScript</button>
+        <button class="lang-tab" onclick="switchLang(this,'py')">Python</button>
+        <button class="lang-tab" onclick="switchLang(this,'php')">PHP</button>
+      </div>
+
+      <!-- JS -->
+      <div class="code-window" id="code-js">
+        <div class="cw-header">
+          <div class="cw-dot r"></div><div class="cw-dot y"></div><div class="cw-dot g"></div>
+          <span class="cw-title">webhook_handler.js</span>
+        </div>
+        <div class="code-body">
+<span class="c-comment">// 4. Listen for GhEscrow webhooks</span>
+app.<span class="c-fn">post</span>(<span class="c-str">'/webhooks/escrow'</span>, (req, res) => {
+  <span class="c-key">const</span> { event, transaction } = req.body;
+
+  <span class="c-key">if</span> (event === <span class="c-str">'transaction.funded'</span>) {
+    <span class="c-dim">// Notify seller to ship</span>
+    <span class="c-fn">sendWhatsApp</span>(transaction.seller_phone,
+      <span class="c-str">`Funds secured! Ship your item.`</span>);
+  }
+
+  <span class="c-key">if</span> (event === <span class="c-str">'transaction.completed'</span>) {
+    <span class="c-dim">// Update your order system</span>
+    <span class="c-fn">markOrderComplete</span>(transaction.reference);
+    <span class="c-fn">notifyBothParties</span>(transaction);
+  }
+
+  <span class="c-key">if</span> (event === <span class="c-str">'transaction.disputed'</span>) {
+    <span class="c-dim">// Escalate in your support system</span>
+    <span class="c-fn">createSupportTicket</span>(transaction);
+  }
+
+  res.<span class="c-fn">sendStatus</span>(<span class="c-num">200</span>);
+});
+        </div>
+      </div>
+
+      <!-- Python -->
+      <div class="code-window" id="code-py" style="display:none">
+        <div class="cw-header">
+          <div class="cw-dot r"></div><div class="cw-dot y"></div><div class="cw-dot g"></div>
+          <span class="cw-title">create_escrow.py</span>
+        </div>
+        <div class="code-body">
+<span class="c-comment"># Create escrow with Python</span>
+<span class="c-key">import</span> requests
+
+response = requests.<span class="c-fn">post</span>(
+  <span class="c-str">'https://api.ghescrow.com/v1/transactions'</span>,
+  headers={<span class="c-str">'Authorization'</span>: <span class="c-str">f'Bearer {API_KEY}'</span>},
+  json={
+    <span class="c-str">'title'</span>:          <span class="c-str">'iPhone 14 Pro — Used'</span>,
+    <span class="c-str">'amount_ghs'</span>:     <span class="c-num">4500</span>,
+    <span class="c-str">'buyer_phone'</span>:    <span class="c-str">'+233201234567'</span>,
+    <span class="c-str">'seller_phone'</span>:   <span class="c-str">'+233551234567'</span>,
+    <span class="c-str">'fee_payer'</span>:      <span class="c-str">'split'</span>,
+    <span class="c-str">'webhook_url'</span>:    <span class="c-str">'https://yourbiz.com/webhooks'</span>,
+  }
+)
+
+tx = response.<span class="c-fn">json</span>()[<span class="c-str">'transaction'</span>]
+<span class="c-fn">print</span>(tx[<span class="c-str">'payment_link'</span>])
+<span class="c-dim"># → ghescrow.com/pay/ESC-00847291</span>
+        </div>
+      </div>
+
+      <!-- PHP -->
+      <div class="code-window" id="code-php" style="display:none">
+        <div class="cw-header">
+          <div class="cw-dot r"></div><div class="cw-dot y"></div><div class="cw-dot g"></div>
+          <span class="cw-title">create_escrow.php</span>
+        </div>
+        <div class="code-body">
+<span class="c-comment">// Create escrow with PHP (cURL)</span>
+<span class="c-key">$data</span> = [
+  <span class="c-str">'title'</span>       => <span class="c-str">'Fabric Bales — Wholesale'</span>,
+  <span class="c-str">'amount_ghs'</span>  => <span class="c-num">12000</span>,
+  <span class="c-str">'buyer_phone'</span> => <span class="c-str">'+233201234567'</span>,
+  <span class="c-str">'seller_phone'</span>=> <span class="c-str">'+233551234567'</span>,
+  <span class="c-str">'fee_payer'</span>   => <span class="c-str">'seller'</span>,
+];
+<span class="c-key">$ch</span> = <span class="c-fn">curl_init</span>(<span class="c-str">'https://api.ghescrow.com/v1/transactions'</span>);
+<span class="c-fn">curl_setopt</span>(<span class="c-key">$ch</span>, CURLOPT_POST, <span class="c-num">1</span>);
+<span class="c-fn">curl_setopt</span>(<span class="c-key">$ch</span>, CURLOPT_POSTFIELDS, <span class="c-fn">json_encode</span>(<span class="c-key">$data</span>));
+<span class="c-fn">curl_setopt</span>(<span class="c-key">$ch</span>, CURLOPT_HTTPHEADER, [
+  <span class="c-str">'Authorization: Bearer '</span> . <span class="c-key">$API_KEY</span>,
+  <span class="c-str">'Content-Type: application/json'</span>,
+]);
+<span class="c-key">$response</span> = <span class="c-fn">json_decode</span>(<span class="c-fn">curl_exec</span>(<span class="c-key">$ch</span>));
+<span class="c-key">echo</span> <span class="c-key">$response</span>->transaction->payment_link;
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══════════════════════════════════════════════ -->
+<section class="section" id="pricing" style="background:var(--ink)">
+  <div class="sec-label">Transparent Pricing</div>
+  <h2 class="sec-title">Simple Plans for <em>Every Size</em></h2>
+  <p class="sec-sub">No setup fees. No hidden charges. Scale as your transaction volume grows.</p>
+
+  <div class="pricing-grid">
+    <!-- Starter -->
+    <div class="price-card">
+      <div class="pc-tier">Starter</div>
+      <div class="pc-price"><span>GHS</span>0<sub>/ month</sub></div>
+      <div class="pc-desc">For indie sellers and small shops testing the platform.</div>
+      <ul class="pc-features">
+        <li>Up to 50 transactions/month</li>
+        <li>2% per transaction</li>
+        <li>MoMo + Card payments</li>
+        <li>Basic dispute resolution</li>
+        <li>Payment link sharing</li>
+        <li class="dim">API access</li>
+        <li class="dim">Webhook events</li>
+        <li class="dim">Dedicated support</li>
+      </ul>
+      <button class="pc-btn outline-btn" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})">Get Started Free</button>
+    </div>
+
+    <!-- Growth — FEATURED -->
+    <div class="price-card featured">
+      <div class="pc-tier">Growth</div>
+      <div class="pc-price"><span>GHS</span>500<sub>/ month</sub></div>
+      <div class="pc-desc">For e-commerce stores and active marketplaces ready to scale.</div>
+      <ul class="pc-features">
+        <li>Up to 500 transactions/month</li>
+        <li>1.5% per transaction</li>
+        <li>Full REST API access</li>
+        <li>Webhook events (all statuses)</li>
+        <li>Embeddable checkout widget</li>
+        <li>Sandbox environment</li>
+        <li>Priority dispute resolution</li>
+        <li class="dim">Custom branding</li>
+      </ul>
+      <button class="pc-btn gold-btn" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})">Start Free Trial →</button>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="price-card">
+      <div class="pc-tier">Enterprise</div>
+      <div class="pc-price"><span>GHS</span>2,000<sub>/ month</sub></div>
+      <div class="pc-desc">For high-volume platforms, logistics firms, and white-label integrations.</div>
+      <ul class="pc-features">
+        <li>Unlimited transactions</li>
+        <li>Custom rate (from 0.8%)</li>
+        <li>White-label API (your branding)</li>
+        <li>Dedicated account manager</li>
+        <li>Custom KYC flows</li>
+        <li>SLA uptime guarantee (99.9%)</li>
+        <li>Direct BoG compliance support</li>
+        <li>Custom webhook retry logic</li>
+      </ul>
+      <button class="pc-btn outline-btn" onclick="document.getElementById('contactForm').scrollIntoView({behavior:'smooth'})">Contact Sales →</button>
+    </div>
+  </div>
+
+  <!-- Feature comparison table -->
+  <div style="overflow-x:auto;margin-top:32px">
+    <table class="feat-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Starter</th>
+          <th>Growth</th>
+          <th>Enterprise</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="ft-group"><td colspan="4">Payments</td></tr>
+        <tr><td>MTN / Telecel / AT MoMo</td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Debit / Credit Card</td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Instant Payout (+0.5%)</td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Milestone Payments</td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+
+        <tr class="ft-group"><td colspan="4">Developer</td></tr>
+        <tr><td>REST API Access</td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Webhook Events</td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Sandbox Environment</td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>White-Label (Your Brand)</td><td><span class="ft-cross">—</span></td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td></tr>
+
+        <tr class="ft-group"><td colspan="4">Trust & Compliance</td></tr>
+        <tr><td>Ghana Card KYC</td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Dispute Resolution</td><td>Standard</td><td>Priority</td><td><span class="ft-custom">24hr SLA</span></td></tr>
+        <tr><td>Custom KYC Flow</td><td><span class="ft-cross">—</span></td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td></tr>
+        <tr><td>Dedicated Account Manager</td><td><span class="ft-cross">—</span></td><td><span class="ft-cross">—</span></td><td><span class="ft-check">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ API ENDPOINTS PREVIEW ══════════════════════════════════ -->
+<section class="section" id="api" style="background:var(--ink2)">
+  <div class="sec-label">API Reference</div>
+  <h2 class="sec-title">Clean REST. <em>Full Control.</em></h2>
+  <p class="sec-sub">Every action a user takes in the app is also available as an API call — giving your platform full programmatic control over every escrow.</p>
+
+  <div class="endpoints-grid">
+    <div class="ep-card"><span class="ep-method m-post">POST</span><div><div class="ep-path">/v1/transactions</div><div class="ep-desc">Create a new escrow transaction</div></div></div>
+    <div class="ep-card"><span class="ep-method m-get">GET</span><div><div class="ep-path">/v1/transactions</div><div class="ep-desc">List all transactions for your account</div></div></div>
+    <div class="ep-card"><span class="ep-method m-get">GET</span><div><div class="ep-path">/v1/transactions/:ref</div><div class="ep-desc">Fetch a single transaction by reference</div></div></div>
+    <div class="ep-card"><span class="ep-method m-patch">PATCH</span><div><div class="ep-path">/v1/transactions/:id/fund</div><div class="ep-desc">Initiate MoMo / card funding</div></div></div>
+    <div class="ep-card"><span class="ep-method m-patch">PATCH</span><div><div class="ep-path">/v1/transactions/:id/ship</div><div class="ep-desc">Mark item as in transit</div></div></div>
+    <div class="ep-card"><span class="ep-method m-patch">PATCH</span><div><div class="ep-path">/v1/transactions/:id/release</div><div class="ep-desc">Release funds to seller</div></div></div>
+    <div class="ep-card"><span class="ep-method m-post">POST</span><div><div class="ep-path">/v1/transactions/:id/dispute</div><div class="ep-desc">Raise a dispute and freeze funds</div></div></div>
+    <div class="ep-card"><span class="ep-method m-post">POST</span><div><div class="ep-path">/v1/transactions/:id/milestones</div><div class="ep-desc">Add milestone schedule to a deal</div></div></div>
+    <div class="ep-card"><span class="ep-method m-patch">PATCH</span><div><div class="ep-path">/v1/milestones/:id/release</div><div class="ep-desc">Release a single milestone payment</div></div></div>
+    <div class="ep-card"><span class="ep-method m-post">POST</span><div><div class="ep-path">/v1/webhooks</div><div class="ep-desc">Register a webhook endpoint</div></div></div>
+    <div class="ep-card"><span class="ep-method m-get">GET</span><div><div class="ep-path">/v1/users/:phone/profile</div><div class="ep-desc">Fetch reputation score + KYC status</div></div></div>
+    <div class="ep-card"><span class="ep-method m-get">GET</span><div><div class="ep-path">/v1/account/balance</div><div class="ep-desc">Your platform escrow balance</div></div></div>
+  </div>
+
+  <div style="margin-top:24px;text-align:center">
+    <a href="#" class="btn-outline" style="display:inline-flex">📄 Full API Reference →</a>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══════════════════════════════════════════ -->
+<section class="section testi-section">
+  <div class="sec-label">Early Partners</div>
+  <h2 class="sec-title">What Businesses <em>Are Saying</em></h2>
+
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-quote">We integrated GhEscrow into our checkout in two days. Buyer disputes dropped by 80% in the first month. It just works.</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:#16a34a;color:#fff">KO</div>
+        <div><div class="testi-name">Kweku Osei</div><div class="testi-biz">CTO, ShopGhana Marketplace</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">Our sellers on Instagram used to lose customers because nobody trusted them. The Verified Seller badge changed everything — conversions went up 3x.</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:#ca8a04;color:#fff">AK</div>
+        <div><div class="testi-name">Abena Konadu</div><div class="testi-biz">Founder, AKStyles GH</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">The webhook system is clean and reliable. We get real-time delivery confirmation for every order — no manual follow-up calls to riders anymore.</div>
+      <div class="testi-author">
+        <div class="testi-av" style="background:#1d4ed8;color:#fff">BE</div>
+        <div><div class="testi-name">Bright Ennin</div><div class="testi-biz">Head of Engineering, DeliverGH</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ═════════════════════════════════════════════════ -->
+<section class="section" style="background:var(--ink);border-top:1px solid var(--border)">
+  <div class="split">
+    <div>
+      <div class="sec-label">By the Numbers</div>
+      <h2 class="sec-title">Built for <em>Scale</em></h2>
+      <p class="sec-sub">Our infrastructure is designed to handle millions of transactions across Ghana's most active business corridors.</p>
+    </div>
+    <div>
+      <div class="stat-row">
+        <div class="stat-block"><div class="sv">99<span>.9%</span></div><div class="sl">API Uptime SLA</div></div>
+        <div class="stat-block"><div class="sv">&lt;<span>200ms</span></div><div class="sl">Avg API Response</div></div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-block"><div class="sv">3<span> networks</span></div><div class="sl">MTN, Telecel, AT MoMo</div></div>
+        <div class="stat-block"><div class="sv">48<span>hr</span></div><div class="sl">Max Dispute Resolution</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CONTACT / GET ACCESS ══════════════════════════════════ -->
+<section class="cta-section" id="contact">
+  <h2>Ready to <em>Build</em> with GhEscrow?</h2>
+  <p>Tell us about your platform and we'll get you sandbox access — usually within 24 hours.</p>
+
+  <div id="contactForm">
+    <div class="cta-form">
+      <div class="cta-input-wrap">
+        <input class="cta-input" type="text" id="bizName" placeholder="Business name" />
+      </div>
+      <div class="cta-input-wrap">
+        <input class="cta-input" type="tel" id="bizPhone" placeholder="+233 55 000 0000" />
+      </div>
+      <button class="btn-gold" onclick="submitBizForm()" style="border:none">Get API Access →</button>
+    </div>
+    <div style="margin-top:12px;font-size:.74rem;color:var(--muted);text-align:center;position:relative;z-index:1">
+      Or email us directly: <strong style="color:var(--gold-lt)">business@ghescrow.com</strong>
+    </div>
+  </div>
+
+  <div class="cta-success" id="ctaSuccess">
+    <div class="cs-check">✓</div>
+    <div><strong>Request received!</strong> We'll reach out within 24 hours with your sandbox credentials.</div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="fl">Gh<span>Escrow</span></div>
+      <p>Ghana's trusted escrow infrastructure for individuals and businesses. Built with ❤️ for Ghanaian commerce.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <a href="how-it-works.html">How it Works</a>
+      <a href="#">For Business</a>
+      <a href="app.html">Web App</a>
+      <a href="#">Android App</a>
+    </div>
+    <div class="footer-col">
+      <h4>Developers</h4>
+      <a href="#api">API Reference</a>
+      <a href="#">Webhooks</a>
+      <a href="#">Sandbox</a>
+      <a href="#">Changelog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About Us</a>
+      <a href="#">Blog</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 GhEscrow Ltd. Built for Ghana 🇬🇭</p>
+    <div class="powered">
+      <span class="powered-badge">Paystack</span>
+      <span class="powered-badge">Hubtel</span>
+      <span class="powered-badge">BoG Compliant</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Integration steps ── */
+function setIntStep(clicked, idx) {
+  document.querySelectorAll('.int-step').forEach((s,i) => {
+    s.classList.toggle('active', i === idx);
+  });
+}
+
+/* ── Language tabs ── */
+function switchLang(btn, lang) {
+  document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['js','py','php'].forEach(l => {
+    const el = document.getElementById('code-'+l);
+    if(el) el.style.display = l===lang ? '' : 'none';
+  });
+}
+
+/* ── Biz form ── */
+function submitBizForm() {
+  const name  = document.getElementById('bizName').value.trim();
+  const phone = document.getElementById('bizPhone').value.trim();
+  if(!name || !phone) {
+    const inputs = document.querySelectorAll('.cta-input');
+    inputs.forEach(i => {
+      if(!i.value.trim()){
+        i.closest('.cta-input-wrap').style.borderColor='var(--red)';
+        setTimeout(()=> i.closest('.cta-input-wrap').style.borderColor='',1500);
+      }
+    });
+    return;
+  }
+  try {
+    const leads = JSON.parse(localStorage.getItem('ghescrow_biz_leads')||'[]');
+    leads.push({name,phone,at:new Date().toISOString()});
+    localStorage.setItem('ghescrow_biz_leads', JSON.stringify(leads));
+  } catch(e){}
+  document.getElementById('contactForm').style.display='none';
+  document.getElementById('ctaSuccess').classList.add('show');
+}
+
+/* ── Smooth anchor scroll ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if(el){ e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+</script>
+</body>
+</html>

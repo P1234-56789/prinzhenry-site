@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GhEscrow — Shop with Confidence. Sell with Trust.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ─────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --forest: #0d2b1f; --forest2: #163828;
+  --gold: #e8a020;   --gold-light: #f5c460;
+  --cream: #faf5e9;  --cream2: #f0e8d0;
+  --text: #1a1a1a;   --muted: #7a6e5a;
+  --green: #22c55e;
+  --radius: 14px;
+  --pad-x: clamp(20px, 5vw, 64px);
+}
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+button { cursor: pointer; }
+
+/* ─── KENTE STRIP ───────────────────────────────────────────── */
+.kente {
+  height: 7px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gold) 0, var(--gold) 18px,
+    var(--forest) 18px, var(--forest) 27px,
+    #c0392b 27px, #c0392b 45px,
+    var(--forest) 45px, var(--forest) 54px,
+    var(--gold-light) 54px, var(--gold-light) 72px,
+    var(--forest) 72px, var(--forest) 81px
+  );
+}
+
+/* ─── NAV ───────────────────────────────────────────────────── */
+nav {
+  padding: 18px var(--pad-x);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0;
+  background: rgba(250,245,233,0.95);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  border-bottom: 1px solid rgba(240,232,208,0.6);
+}
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 900; font-size: clamp(1.2rem, 3vw, 1.5rem);
+  color: var(--forest); letter-spacing: -1px; text-decoration: none;
+}
+.nav-logo span { color: var(--gold); }
+.nav-pill {
+  background: var(--forest); color: var(--gold-light);
+  font-size: clamp(0.6rem, 1.5vw, 0.72rem);
+  font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+  padding: 7px 14px; border-radius: 100px; white-space: nowrap;
+}
+
+/* ─── HERO ──────────────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  min-height: calc(100svh - 60px);
+  padding: 48px var(--pad-x);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Big circle bg — desktop only */
+.hero::before {
+  content: '';
+  position: absolute; right: -140px; top: 50%;
+  transform: translateY(-50%);
+  width: min(720px, 55vw); height: min(720px, 55vw);
+  background: var(--forest);
+  border-radius: 50%; z-index: 0;
+  pointer-events: none;
+}
+
+/* Floating geo squares */
+.geo { position: absolute; z-index: 1; pointer-events: none; }
+.geo-1 {
+  width: clamp(40px, 6vw, 80px); height: clamp(40px, 6vw, 80px);
+  background: var(--gold); top: 10%; right: 43%;
+  transform: rotate(15deg); opacity: 0.14;
+  animation: fl1 6s ease-in-out infinite;
+}
+.geo-2 {
+  width: clamp(22px, 3vw, 40px); height: clamp(22px, 3vw, 40px);
+  background: #c0392b; top: 72%; right: 55%;
+  transform: rotate(-22deg); opacity: 0.12;
+  animation: fl2 9s ease-in-out infinite;
+}
+@keyframes fl1 { 0%,100%{transform:rotate(15deg) translateY(0)} 50%{transform:rotate(15deg) translateY(-14px)} }
+@keyframes fl2 { 0%,100%{transform:rotate(-22deg) translateY(0)} 50%{transform:rotate(-22deg) translateY(10px)} }
+
+/* ─── HERO LEFT ─────────────────────────────────────────────── */
+.hero-left {
+  position: relative; z-index: 2;
+  animation: fadeUp .85s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+}
+.eyebrow::before { content:''; display:block; width:24px; height:2px; background:var(--gold); }
+
+h1 {
+  font-family: 'Fraunces', serif; font-weight: 900;
+  font-size: clamp(2.6rem, 5.5vw, 5rem);
+  line-height: 1.0; letter-spacing: -2px;
+  color: var(--forest); margin-bottom: 24px;
+}
+h1 em { font-style: italic; color: var(--gold); }
+
+.sub {
+  font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+  line-height: 1.75; color: var(--muted);
+  max-width: 460px; margin-bottom: 36px; font-weight: 300;
+}
+.sub strong { color: var(--forest); font-weight: 500; }
+
+/* ─── FORM ──────────────────────────────────────────────────── */
+.form-wrap {
+  display: flex; flex-direction: column; gap: 12px;
+  max-width: 440px;
+}
+.input-group {
+  display: flex; background: #fff;
+  border: 2px solid var(--cream2); border-radius: 12px;
+  overflow: hidden; transition: border-color .2s;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+.input-group:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 2px 22px rgba(232,160,32,.18);
+}
+.prefix {
+  display: flex; align-items: center; gap: 5px;
+  padding: 0 12px; background: var(--cream2);
+  font-size: .82rem; font-weight: 500; color: var(--muted);
+  white-space: nowrap; border-right: 2px solid var(--cream2);
+  flex-shrink: 0;
+}
+.ph-input {
+  flex: 1; padding: 16px 16px; border: none; outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.05rem);
+  color: var(--text); background: transparent; min-width: 0;
+}
+.ph-input::placeholder { color: #c0b89a; }
+.cta-btn {
+  width: 100%; padding: 17px 24px;
+  background: var(--forest); color: var(--gold-light);
+  font-family: 'Fraunces', serif; font-weight: 700;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  border: none; border-radius: 12px;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.cta-btn:hover  { background: #0a2016; transform: translateY(-2px); box-shadow: 0 10px 28px rgba(13,43,31,.28); }
+.cta-btn:active { transform: translateY(0); box-shadow: none; }
+.form-note { font-size: .74rem; color: var(--muted); text-align: center; }
+
+/* ─── SUCCESS ───────────────────────────────────────────────── */
+.success-msg {
+  display: none; align-items: center; gap: 12px;
+  padding: 16px 18px; background: #f0fdf4;
+  border: 1px solid #bbf7d0; border-radius: 12px;
+  font-size: .9rem; color: #166534; max-width: 440px;
+}
+.success-msg.show { display: flex; animation: fadeUp .4s ease; }
+.s-check {
+  width: 30px; height: 30px; background: #16a34a;
+  border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; color: #fff; font-size: .9rem; flex-shrink: 0;
+}
+
+/* ─── SOCIAL PROOF ──────────────────────────────────────────── */
+.social-proof { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.avatars { display: flex; }
+.av {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2.5px solid var(--cream);
+  margin-left: -9px; display: flex; align-items: center;
+  justify-content: center; font-weight: 700; font-size: .82rem;
+}
+.av:first-child { margin-left: 0; }
+.a1{background:#16a34a;color:#fff}
+.a2{background:#ca8a04;color:#fff}
+.a3{background:#dc2626;color:#fff}
+.a4{background:var(--forest);color:var(--gold-light);font-size:.6rem}
+.s-text { font-size: .82rem; color: var(--muted); line-height: 1.45; }
+.s-text strong { color: var(--forest); font-weight: 500; display: block; }
+
+/* ─── HERO RIGHT / PHONE MOCKUP ─────────────────────────────── */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeUp .85s .18s ease both;
+}
+.phone-wrap { position: relative; }
+.phone {
+  width: clamp(220px, 22vw, 270px);
+  background: #fff; border-radius: 38px;
+  padding: 18px 15px;
+  box-shadow: 0 0 0 8px var(--forest2), 0 36px 72px rgba(0,0,0,.38);
+  position: relative; z-index: 2;
+}
+.notch {
+  width: 72px; height: 20px; background: var(--forest2);
+  border-radius: 10px; margin: 0 auto 16px;
+}
+.screen {
+  background: var(--cream); border-radius: 18px;
+  padding: 14px; min-height: 360px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.s-header { display: flex; align-items: center; justify-content: space-between; }
+.s-logo { font-family:'Fraunces',serif; font-weight:900; font-size:.95rem; color:var(--forest); }
+.s-logo span { color: var(--gold); }
+.s-av {
+  width:26px; height:26px; border-radius:50%;
+  background:var(--forest); display:flex; align-items:center;
+  justify-content:center; font-size:.65rem; color:var(--gold-light); font-weight:700;
+}
+.tx-card { background:var(--forest); border-radius:13px; padding:13px; color:#fff; }
+.tx-lbl { font-size:.58rem; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:3px; }
+.tx-ref { font-family:'Fraunces',serif; font-size:.78rem; color:var(--gold-light); font-weight:700; margin-bottom:8px; }
+.tx-amt { font-family:'Fraunces',serif; font-weight:900; font-size:1.65rem; letter-spacing:-1px; }
+.tx-amt span { font-size:.92rem; font-weight:300; opacity:.65; margin-right:3px; }
+.progress { display:flex; gap:4px; margin-top:9px; }
+.ps { flex:1; height:3.5px; border-radius:2px; background:rgba(255,255,255,.15); }
+.ps.done { background:var(--green); }
+.ps.active { background:var(--gold); }
+.p-labels { display:flex; justify-content:space-between; margin-top:4px; font-size:.5rem; color:rgba(255,255,255,.38); }
+.p-labels .al { color:var(--gold-light); }
+.parties { display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:10px; padding:9px 11px; }
+.party { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.p-av { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; }
+.b-av{background:#dbeafe;color:#1d4ed8} .se-av{background:#dcfce7;color:#15803d}
+.p-name{font-size:.58rem;color:var(--muted);font-weight:500}
+.p-role{font-size:.52rem;color:#bbb}
+.tx-badge { display:inline-flex; align-items:center; gap:5px; background:#fefce8; border:1px solid #fde047; border-radius:6px; padding:5px 9px; font-size:.62rem; font-weight:500; color:#854d0e; align-self:flex-start; }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.act-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.abtn { padding:9px 5px; border-radius:8px; border:none; font-size:.62rem; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; }
+.b-acc{background:var(--forest);color:var(--gold-light)}
+.b-dis{background:#fee2e2;color:#dc2626}
+
+/* Floating notification bubbles */
+.nb1 {
+  position:absolute; right:-62px; top:52px;
+  background:#fff; border-radius:13px; padding:10px 13px;
+  box-shadow:0 8px 28px rgba(0,0,0,.13);
+  min-width:166px; display:flex; align-items:flex-start; gap:8px;
+  animation: si .8s .5s ease both, bob 4s 1.5s ease-in-out infinite;
+  z-index:5;
+}
+.nb2 {
+  position:absolute; left:-68px; bottom:72px;
+  background:var(--forest); border-radius:13px; padding:10px 13px;
+  box-shadow:0 8px 28px rgba(13,43,31,.3);
+  min-width:148px; display:flex; align-items:center; gap:8px;
+  animation: si2 .8s .9s ease both, bob2 5s 1.8s ease-in-out infinite;
+  z-index:5;
+}
+@keyframes si  { from{opacity:0;transform:translateX(18px)} to{opacity:1;transform:translateX(0)} }
+@keyframes si2 { from{opacity:0;transform:translateX(-18px)} to{opacity:1;transform:translateX(0)} }
+@keyframes bob  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+@keyframes bob2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+.ni{font-size:1.05rem;flex-shrink:0}
+.nt{font-size:.66rem;line-height:1.4}
+.nt strong{display:block;color:var(--forest);font-weight:600;margin-bottom:1px}
+.nt span{color:var(--muted)}
+.nt2{font-size:.66rem;line-height:1.4}
+.nt2 strong{display:block;color:var(--gold-light);font-weight:600;margin-bottom:1px}
+.nt2 span{color:rgba(255,255,255,.55)}
+
+/* ─── FEATURES STRIP ────────────────────────────────────────── */
+.feat-strip {
+  padding: 18px var(--pad-x);
+  border-top: 1px solid var(--cream2);
+  border-bottom: 1px solid var(--cream2);
+  background: #fff;
+  display: flex; align-items: center;
+  justify-content: center; flex-wrap: wrap;
+  gap: 0;
+}
+.fi {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px clamp(12px, 2vw, 22px);
+  font-size: clamp(0.72rem, 1.4vw, 0.83rem);
+  color: var(--muted);
+  border-right: 1px solid var(--cream2);
+}
+.fi:last-child { border-right: none; }
+.fi strong { color: var(--forest); font-weight: 500; }
+
+/* ─── FOOTER ────────────────────────────────────────────────── */
+footer {
+  padding: 20px var(--pad-x);
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 12px;
+}
+.f-logo { font-family:'Fraunces',serif; font-weight:900; font-size:1.1rem; color:var(--forest); }
+.f-logo span { color: var(--gold); }
+footer p { font-size:.74rem; color:var(--muted); }
+.f-links { display:flex; gap:18px; }
+.f-links a { font-size:.74rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+.f-links a:hover { color: var(--forest); }
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ════════════════════════════════════════════════════════════ */
+
+/* ── TABLET LANDSCAPE & SMALL DESKTOP (901px–1180px) ── */
+@media (max-width: 1180px) {
+  .hero { gap: 24px; }
+  .nb1 { right: -48px; }
+  .nb2 { left: -52px; }
+}
+
+/* ── TABLET PORTRAIT (601px–900px) ── */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 40px var(--pad-x) 56px;
+    gap: 52px;
+    text-align: center;
+  }
+  /* Remove big circle, keep it clean */
+  .hero::before { display: none; }
+  .geo { display: none; }
+
+  /* Centre the left column content */
+  .hero-left { display: flex; flex-direction: column; align-items: center; }
+  h1 { font-size: clamp(2.4rem, 6.5vw, 3.6rem); }
+  .sub { text-align: center; max-width: 560px; }
+  .form-wrap { width: 100%; max-width: 500px; }
+  .success-msg { max-width: 500px; }
+  .social-proof { justify-content: center; }
+
+  /* Scale phone mockup down nicely, hide overflowing bubbles */
+  .hero-right { width: 100%; }
+  .phone-wrap { margin: 0 auto; }
+  .phone { width: clamp(200px, 42vw, 260px); }
+  .screen { min-height: 320px; }
+
+  /* Tuck notification bubbles inside so they don't overflow */
+  .nb1 { right: -10px; top: 36px; min-width: 140px; }
+  .nb2 { left: -10px; bottom: 56px; min-width: 130px; }
+
+  /* Features strip: wrap into 2 cols on tablet */
+  .feat-strip { justify-content: flex-start; }
+  .fi {
+    flex: 0 0 50%;
+    border-right: none;
+    border-bottom: 1px solid var(--cream2);
+    padding: 12px 16px;
+  }
+  .fi:nth-last-child(-n+2) { border-bottom: none; }
+
+  footer { justify-content: center; text-align: center; }
+  .f-links { justify-content: center; }
+}
+
+/* ── MOBILE (≤600px) ── */
+@media (max-width: 600px) {
+  nav { padding: 14px 20px; }
+  .nav-pill { font-size: .6rem; padding: 6px 12px; letter-spacing: 1.5px; }
+
+  .hero {
+    padding: 32px 20px 48px;
+    gap: 40px;
+  }
+  h1 { font-size: clamp(2.1rem, 9.5vw, 2.8rem); letter-spacing: -1.5px; }
+  .sub { font-size: .94rem; margin-bottom: 28px; }
+
+  /* Full-width form, bigger tap targets */
+  .form-wrap { max-width: 100%; }
+  .ph-input { padding: 15px 14px; font-size: 1rem; }
+  .cta-btn { padding: 16px 20px; font-size: 1rem; border-radius: 10px; }
+  .prefix { padding: 0 10px; font-size: .78rem; }
+
+  /* Phone mockup — smaller, no bubbles on tiny screens */
+  .phone { width: clamp(190px, 60vw, 240px); }
+  .screen { min-height: 300px; padding: 12px; }
+  .nb1, .nb2 { display: none; }
+
+  /* Features: single column on small phones */
+  .fi { flex: 0 0 100%; border-bottom: 1px solid var(--cream2); }
+  .fi:last-child { border-bottom: none; }
+
+  footer { flex-direction: column; gap: 8px; padding: 18px 20px; }
+  .f-links { gap: 16px; }
+}
+
+/* ── TINY PHONES (≤380px) ── */
+@media (max-width: 380px) {
+  h1 { font-size: 2rem; }
+  .phone { width: 170px; }
+  .screen { min-height: 270px; gap: 8px; padding: 10px; }
+  .tx-amt { font-size: 1.4rem; }
+  .eyebrow { font-size: .62rem; }
+}
+
+nav { padding:18px var(--pad-x); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:rgba(250,245,233,.95); backdrop-filter:blur(8px); z-index:100; border-bottom:1px solid rgba(240,232,208,.6); }
+.nav-logo { font-family:'Fraunces',serif; font-weight:900; font-size:clamp(1.2rem,3vw,1.5rem); color:var(--forest); letter-spacing:-1px; }
+.nav-logo span { color:var(--gold); }
+.nav-links { display:flex; gap:clamp(12px,2.5vw,28px); align-items:center; }
+.nav-links a { font-size:.85rem; color:var(--muted); font-weight:400; transition:color .2s; }
+.nav-links a:hover { color:var(--forest); }
+.nav-links a.active { color:var(--forest); font-weight:500; }
+.nav-cta { background:var(--forest); color:var(--gold-light) !important; padding:8px 18px; border-radius:100px; font-size:.78rem !important; font-weight:500 !important; letter-spacing:.5px; transition:background .2s !important; }
+.nav-cta:hover { background:#0a2016 !important; }
+
+</style>
+</head>
+<body>
+
+<div class="kente"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">Gh<span>Escrow</span></a>
+  
+  <div class="nav-links">
+    <a href="how-it-works.html" class="active">How it Works</a>
+    <a href="for-business.html">For Business</a>
+  </div>
+  <div class="nav-pill">🇬🇭 &nbsp;Coming Soon</div>
+</nav>
+
+<section class="hero">
+  <div class="geo geo-1"></div>
+  <div class="geo geo-2"></div>
+
+  <!-- ── LEFT: Copy + Form ── -->
+  <div class="hero-left">
+    <div class="eyebrow">Ghana's Escrow Platform</div>
+
+    <h1>Shop with<br><em>Confidence.</em><br>Sell with Trust.</h1>
+
+    <p class="sub">
+      No more paying strangers and hoping for the best.
+      GhEscrow holds your money safely until you receive
+      exactly what you ordered — <strong>every single time.</strong>
+    </p>
+
+    <!-- Waitlist Form -->
+    <div class="form-wrap" id="formWrap">
+      <div class="input-group">
+        <div class="prefix"><span>🇬🇭</span><span>+233</span></div>
+        <input
+          class="ph-input" id="phoneInput"
+          type="tel" inputmode="numeric"
+          placeholder="55 123 4567" maxlength="10"
+          autocomplete="tel"
+        />
+      </div>
+      <button class="cta-btn" onclick="handleSubmit()">
+        Join the Early Access List →
+      </button>
+      <div class="form-note">🔒 No spam. We'll WhatsApp you when we launch.</div>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-msg" id="successMsg">
+      <div class="s-check">✓</div>
+      <div>
+        <strong>You're on the list!</strong><br>
+        We'll WhatsApp you at +233&nbsp;<span id="numConfirm"></span> on launch day.
+      </div>
+    </div>
+
+    <!-- Social Proof -->
+    <div class="social-proof">
+      <div class="avatars">
+        <div class="av a1">K</div>
+        <div class="av a2">A</div>
+        <div class="av a3">E</div>
+        <div class="av a4">+497</div>
+      </div>
+      <div class="s-text">
+        <strong id="counter">500+ Ghanaians already waiting</strong>
+        From Accra, Kumasi, Tema &amp; beyond
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Phone Mockup ── -->
+  <div class="hero-right">
+    <div class="phone-wrap">
+
+      <!-- Notification bubble top-right -->
+      <div class="nb1">
+        <div class="ni">🔒</div>
+        <div class="nt">
+          <strong>Funds Secured</strong>
+          <span>GHS 850 held in escrow</span>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="s-header">
+            <div class="s-logo">Gh<span>Escrow</span></div>
+            <div class="s-av">KO</div>
+          </div>
+          <div class="tx-card">
+            <div class="tx-lbl">Active Transaction</div>
+            <div class="tx-ref">ESC-00847291</div>
+            <div class="tx-amt"><span>GHS</span>850.00</div>
+            <div class="progress">
+              <div class="ps done"></div>
+              <div class="ps done"></div>
+              <div class="ps active"></div>
+              <div class="ps"></div>
+            </div>
+            <div class="p-labels">
+              <span>Created</span><span>Funded</span>
+              <span class="al">In Transit</span><span>Done</span>
+            </div>
+          </div>
+          <div class="parties">
+            <div class="party">
+              <div class="p-av b-av">KO</div>
+              <div class="p-name">Kofi O.</div>
+              <div class="p-role">Buyer</div>
+            </div>
+            <span style="color:var(--gold);font-size:.95rem">⇄</span>
+            <div class="party">
+              <div class="p-av se-av">AK</div>
+              <div class="p-name">Ama K.</div>
+              <div class="p-role">Seller</div>
+            </div>
+          </div>
+          <div class="tx-badge">
+            <div class="dot"></div>Waiting for delivery
+          </div>
+          <div class="act-row">
+            <button class="abtn b-acc">✓ Accept &amp; Pay</button>
+            <button class="abtn b-dis">⚑ Dispute</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification bubble bottom-left -->
+      <div class="nb2">
+        <div class="nt2">
+          <strong>GHS 850 Released!</strong>
+          <span>Paid to Ama instantly</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Features Strip ── -->
+<div class="feat-strip">
+  <div class="fi"><span>📱</span><span><strong>MoMo Powered</strong> — MTN, Telecel, AT</span></div>
+  <div class="fi"><span>🛡️</span><span><strong>Dispute Protection</strong> — Evidence-based</span></div>
+  <div class="fi"><span>🛵</span><span><strong>Rider Verified</strong> — GPS + photo</span></div>
+  <div class="fi"><span>🏢</span><span><strong>API for Businesses</strong> — Embed anywhere</span></div>
+  <div class="fi"><span>🪪</span><span><strong>Ghana Card KYC</strong> — No scammers</span></div>
+</div>
+
+<footer>
+  <div class="f-logo">Gh<span>Escrow</span></div>
+  <p>© 2025 GhEscrow. Built for Ghana 🇬🇭</p>
+  <div class="f-links">
+    <a href="how-it-works.html">How it Works</a>
+    <a href="#">For Business</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // ── CONFIGURATION ──────────────────────────────────────────
+  // Paste your deployed Google Apps Script URL here after setup:
+  const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+  // ───────────────────────────────────────────────────────────
+
+  document.getElementById('phoneInput').addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g, '');
+  });
+  document.getElementById('phoneInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+
+  async function handleSubmit() {
+    const raw   = document.getElementById('phoneInput').value.replace(/\D/g, '');
+    const group = document.getElementById('phoneInput').closest('.input-group');
+    const btn   = document.querySelector('.cta-btn');
+
+    // Validate
+    if (raw.length < 9) {
+      group.style.borderColor = '#dc2626';
+      group.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+      document.getElementById('phoneInput').focus();
+      setTimeout(() => { group.style.borderColor=''; group.style.boxShadow=''; }, 1600);
+      return;
+    }
+
+    const phone = '+233' + raw;
+
+    // Loading state
+    btn.textContent = 'Saving your spot…';
+    btn.disabled = true;
+    btn.style.opacity = '0.75';
+
+    // ── Submit to Google Sheets ──
+    let sheetOk = false;
+    if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+      try {
+        const fd = new FormData();
+        fd.append('phone', phone);
+        fd.append('timestamp', new Date().toISOString());
+        fd.append('source', 'landing_page');
+        // Apps Script requires no-cors for FormData POST
+        await fetch(APPS_SCRIPT_URL, { method: 'POST', body: fd, mode: 'no-cors' });
+        sheetOk = true;
+      } catch (err) {
+        console.warn('Sheet save failed, falling back to local:', err);
+      }
+    }
+
+    // Always keep a local backup copy
+    try {
+      const list = JSON.parse(localStorage.getItem('ghescrow_waitlist') || '[]');
+      list.push({ phone, savedToSheet: sheetOk, at: new Date().toISOString() });
+      localStorage.setItem('ghescrow_waitlist', JSON.stringify(list));
+    } catch(e) {}
+
+    // Show success
+    document.getElementById('numConfirm').textContent = raw;
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+    document.getElementById('counter').textContent = '501+ Ghanaians already waiting';
+  }
+</script>
+</body>
+</html>
