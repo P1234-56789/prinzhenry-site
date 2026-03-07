@@ -1094,7 +1094,7 @@ async function submitBizForm() {
   btn.style.opacity = '0.7';
 
   
-  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbyCUZalArrG8Btspfde00DCTdDF64Xbd-vbLsOM1Si4Cw0JtHhRm1xjyEceazLpxBJX/exec') {
+  if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== '') {
     try {
       const fd = new FormData();
       fd.append('biz_name',  name);
